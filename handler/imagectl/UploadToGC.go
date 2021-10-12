@@ -39,7 +39,7 @@ func getRandomImage() string {
 func ArrangeImageUrl(imageUrl string) string {
 	bktName := "img.gitouhon-juku-k8s2.ga"
 	imageBaseURL := "https://img.gitouhon-juku-k8s2.ga/"
-	credentialFilePath := "config_gcp.json"
+	credentialFilePath := "config/config_gcp.json"
 	if imageUrl == 	"" || !strings.HasPrefix(imageUrl, "http") {
 		return getRandomImage()
 	}
@@ -80,7 +80,7 @@ func UploadToGC() echo.HandlerFunc {
 		bktName := "img.gitouhon-juku-k8s2.ga"
 		objName := "sample_cat.jpg"
 		imageUrl := "http://placekitten.com/g/640/340"
-		credentialFilePath := "config_gcp.json"
+		credentialFilePath := "config/config_gcp.json"
 		ctx := context.Background()
 
 		client, err := storage.NewClient(ctx, option.WithCredentialsFile(credentialFilePath))

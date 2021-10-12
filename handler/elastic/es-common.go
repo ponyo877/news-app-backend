@@ -26,7 +26,7 @@ func checkError(err error) {
 }
 
 func OpenES() *elasticsearch.Client{
-	jsonString, err := ioutil.ReadFile("config_es.json")
+	jsonString, err := ioutil.ReadFile("config/config_es.json")
     checkError(err)
     
     var c ESConfig

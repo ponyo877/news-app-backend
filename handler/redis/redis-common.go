@@ -39,7 +39,7 @@ func getZsetKeys() (zsetKey_m string, zsetKey_w string, zsetKey_d string) {
 }
 
 func OpenKVS() *redis.Client{
-	jsonString, err := ioutil.ReadFile("config_redis.json")
+	jsonString, err := ioutil.ReadFile("config/config_redis.json")
     checkError(err)
     
     var c KVSConfig

@@ -27,7 +27,7 @@ func checkError(err error) {
 }
 
 func openDB() *sql.DB{
-    jsonString, err := ioutil.ReadFile("config.json")
+    jsonString, err := ioutil.ReadFile("config/config.json")
     checkError(err)
     
     var c DBConfig

@@ -22,7 +22,7 @@ import (
 func UploadAvatar(file multipart.File, fileHeader *multipart.FileHeader, deviceHash string) (string){
 	bktName := "img.gitouhon-juku-k8s2.ga"
 	imageBaseURL := "https://img.gitouhon-juku-k8s2.ga/"
-	credentialFilePath := "config_gcp.json"
+	credentialFilePath := "config/config_gcp.json"
 
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile(credentialFilePath))

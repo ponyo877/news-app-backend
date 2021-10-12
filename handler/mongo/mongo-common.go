@@ -23,7 +23,7 @@ func checkError(err error) {
 }
 
 func OpenMongo() *mongo.Client{
-	jsonString, err := ioutil.ReadFile("config_mongo.json")
+	jsonString, err := ioutil.ReadFile("config/config_mongo.json")
     checkError(err)
     
     var c MongoConfig
