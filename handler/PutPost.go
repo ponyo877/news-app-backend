@@ -1,16 +1,17 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 	"strconv"
-	"encoding/json"
-    "github.com/labstack/echo"
+	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/labstack/echo"
 	"github.com/mmcdole/gofeed"
-    "github.com/PuerkitoBio/goquery"
-	"./elastic"
-	"./imagectl"
+	"github.com/ponyo877/news-app-backend/handler/elastic"
+	"github.com/ponyo877/news-app-backend/handler/imagectl"
 )
 
 // SiteInfo is metainfomation of RSS Site
@@ -31,10 +32,10 @@ type SiteRecord struct {
 }
 
 func PutPost() echo.HandlerFunc {
-    return func(c echo.Context) error {
+	return func(c echo.Context) error {
 		update_count := PutPostTmp()
-        return c.JSON(http.StatusOK, map[string]int{"update_count": update_count})
-    }
+		return c.JSON(http.StatusOK, map[string]int{"update_count": update_count})
+	}
 }
 
 func PutPostJob() {
@@ -42,36 +43,36 @@ func PutPostJob() {
 	fmt.Println("update_count:", update_count)
 }
 
-func PutPostTmp() int{
+func PutPostTmp() int {
 	siteinfolist := getSiteInfoList()
-    feedparser := gofeed.NewParser()
-    feedArray := []SiteRecord{}
-    isVisit := map[int]bool{}
-    update_count := 0
-    for _, siteinfo := range siteinfolist {
-        isVisit[siteinfo.ID] = false
-        feed, _ := feedparser.ParseURL(siteinfo.rssURL)
-        items := feed.Items
-        for _, item := range items {
-            feedmap := SiteRecord{
-                title:      item.Title,
-                URL:        item.Link,
-                image:      getImageFromFeed(item.Content),
-                updateDate: item.Published,
-                siteID:     siteinfo.ID,
-            }
-            if feedmap.updateDate > siteinfo.latestDate {
-                update_count++
-                feedArray = append(feedArray, feedmap)
-                if !isVisit[siteinfo.ID] {
-                    updateLatestDate(siteinfo.ID, feedmap.updateDate)
-                    isVisit[siteinfo.ID] = true
-                }
-            }
-        }
-    }
-    _ = registerLatestArticleToDB(feedArray)
-    // esId := registerLatestArticleToDB(feedArray)
+	feedparser := gofeed.NewParser()
+	feedArray := []SiteRecord{}
+	isVisit := map[int]bool{}
+	update_count := 0
+	for _, siteinfo := range siteinfolist {
+		isVisit[siteinfo.ID] = false
+		feed, _ := feedparser.ParseURL(siteinfo.rssURL)
+		items := feed.Items
+		for _, item := range items {
+			feedmap := SiteRecord{
+				title:      item.Title,
+				URL:        item.Link,
+				image:      getImageFromFeed(item.Content),
+				updateDate: item.Published,
+				siteID:     siteinfo.ID,
+			}
+			if feedmap.updateDate > siteinfo.latestDate {
+				update_count++
+				feedArray = append(feedArray, feedmap)
+				if !isVisit[siteinfo.ID] {
+					updateLatestDate(siteinfo.ID, feedmap.updateDate)
+					isVisit[siteinfo.ID] = true
+				}
+			}
+		}
+	}
+	_ = registerLatestArticleToDB(feedArray)
+	// esId := registerLatestArticleToDB(feedArray)
 	// registerLatestArticleToES(esId, feedArray)
 	return update_count
 }
@@ -85,15 +86,15 @@ func getImageFromFeed(feed string) string {
 
 func registerLatestArticleToDB(articleList []SiteRecord) []int {
 	db := openDB()
-    defer db.Close()
-    sql01_02 := "INSERT INTO /* sql01_02 */ articleTBL (title, URL, image, updateDate, click, siteID) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
-    var esIdList []int 
+	defer db.Close()
+	sql01_02 := "INSERT INTO /* sql01_02 */ articleTBL (title, URL, image, updateDate, click, siteID) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
+	var esIdList []int
 	var esId int
 	for _, article := range articleList {
-        err := db.QueryRow(sql01_02, article.title, article.URL, article.image, article.updateDate, 0, article.siteID).Scan(&esId)
+		err := db.QueryRow(sql01_02, article.title, article.URL, article.image, article.updateDate, 0, article.siteID).Scan(&esId)
 		checkError(err)
-        esIdList = append(esIdList, esId)
-    }
+		esIdList = append(esIdList, esId)
+	}
 	return esIdList
 }
 
@@ -104,16 +105,16 @@ func jsonStruct(esIt int, doc SiteRecord) string {
 	var sitetitle string
 	err := db.QueryRow(sql01_03, doc.siteID).Scan(&sitetitle)
 	docStruct := map[string]interface{}{
-		"id":			esIt,
-		"image":		doc.image,
-		"publishedAt":	doc.updateDate,
-		"titles":		doc.title,
-		"url":			doc.URL,
-		"sitetitle":    sitetitle,
-    }
-    b, err := json.Marshal(docStruct)
-    checkError(err)
-    return string(b)
+		"id":          esIt,
+		"image":       doc.image,
+		"publishedAt": doc.updateDate,
+		"titles":      doc.title,
+		"url":         doc.URL,
+		"sitetitle":   sitetitle,
+	}
+	b, err := json.Marshal(docStruct)
+	checkError(err)
+	return string(b)
 }
 
 func registerLatestArticleToES(esIdList []int, articleList []SiteRecord) {
@@ -122,7 +123,7 @@ func registerLatestArticleToES(esIdList []int, articleList []SiteRecord) {
 		jsonstrings += "{\"create\":{ \"_index\" : \"test_es\" , \"_id\" : \"" + strconv.Itoa(esIdList[i]) + "\"}}\n"
 		jsonstrings += jsonStruct(esIdList[i], articleList[i]) + "\n"
 	}
-	
+
 	print(jsonstrings)
 	client := elastic.OpenES()
 
@@ -136,7 +137,7 @@ func registerLatestArticleToES(esIdList []int, articleList []SiteRecord) {
 func updateLatestDate(siteID int, updateDate string) {
 	db := openDB()
 	defer db.Close()
-	
+
 	sql01_03 := "UPDATE /* sql01_03 */ siteTBL SET latestDate = $1 WHERE ID = $2"
 	stmt, err := db.Prepare(sql01_03)
 	checkError(err)
@@ -162,7 +163,7 @@ func getSiteInfoList() []SiteInfo {
 			&siteinfo.title,
 			&siteinfo.rssURL,
 			&siteinfo.latestDate,
-		);
+		)
 		checkError(err)
 		siteinfolist = append(siteinfolist, siteinfo)
 	}

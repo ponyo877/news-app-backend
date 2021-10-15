@@ -20,3 +20,4 @@
 Dockerfile*
 recommend/Japanese_L-12_H-768_A-12_E-30_BPE/
 *.json
+*.out

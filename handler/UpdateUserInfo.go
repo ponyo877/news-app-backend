@@ -1,25 +1,26 @@
 package handler
 
 import (
-	_"os"
-	"fmt"
-	"time"
 	"context"
-	"strings"
-	"net/http"
+	"fmt"
 	"io/ioutil"
 	"mime/multipart"
-	"./mongo"
-	"github.com/labstack/echo"
+	"net/http"
+	_ "os"
+	"strings"
+	"time"
+
 	"cloud.google.com/go/storage"
-	"google.golang.org/api/option"
+	"github.com/labstack/echo"
+	"github.com/ponyo877/news-app-backend/handler/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	_ "go.mongodb.org/mongo-driver/bson/primitive"
 	orgmongo "go.mongodb.org/mongo-driver/mongo"
-	_"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"google.golang.org/api/option"
 )
 
-func UploadAvatar(file multipart.File, fileHeader *multipart.FileHeader, deviceHash string) (string){
+func UploadAvatar(file multipart.File, fileHeader *multipart.FileHeader, deviceHash string) string {
 	bktName := "img.gitouhon-juku-k8s2.ga"
 	imageBaseURL := "https://img.gitouhon-juku-k8s2.ga/"
 	credentialFilePath := "config/config_gcp.json"
@@ -49,9 +50,9 @@ func UpdateUserInfo() echo.HandlerFunc {
 		avatar, avaterHeader, err := c.Request().FormFile("avatar")
 		hasAvatar := true
 		if err != nil {
-            fmt.Println("Failed to open file at path")
+			fmt.Println("Failed to open file at path")
 			hasAvatar = false
-        }
+		}
 		fmt.Println(qname)
 
 		ctx := context.Background()
@@ -59,9 +60,9 @@ func UpdateUserInfo() echo.HandlerFunc {
 		err = client.Connect(ctx)
 		defer client.Disconnect(ctx)
 		checkError(err)
-		
+
 		usr_col := client.Database("newsdb").Collection("user_col")
-		usr_filter := bson.M {
+		usr_filter := bson.M{
 			"deviceHash": bson.M{"$eq": qdeviceHash},
 		}
 
@@ -74,7 +75,7 @@ func UpdateUserInfo() echo.HandlerFunc {
 			usr_info["avatar"] = qavatar
 		}
 
-		usr_update := bson.M {
+		usr_update := bson.M{
 			"$set": usr_info,
 		}
 		usr_opts := options.Update().SetUpsert(true)

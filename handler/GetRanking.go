@@ -5,13 +5,13 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
-	"reflect"
 	"net/http"
+	"reflect"
 	"time"
 
-	"./mongo"
-	"./redis"
 	"github.com/labstack/echo"
+	"github.com/ponyo877/news-app-backend/handler/mongo"
+	"github.com/ponyo877/news-app-backend/handler/redis"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	orgmongo "go.mongodb.org/mongo-driver/mongo"
@@ -62,7 +62,7 @@ func GetRankingMongo() echo.HandlerFunc {
 				"_id":         feed["_id"],
 				"viewcount":   id_count["viewcount"], //strconv.Itoa(id_count["viewcount"]),
 				"image":       feed["image"],
-				"publishedAt": tfm.Format(olayput),// feed["publishedAt"],
+				"publishedAt": tfm.Format(olayput), // feed["publishedAt"],
 				"siteID":      feed["siteID"],
 				"sitetitle":   feed["sitetitle"],
 				"titles":      feed["titles"],

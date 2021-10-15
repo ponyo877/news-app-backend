@@ -1,12 +1,9 @@
 package imagectl
 
 import (
-	"cloud.google.com/go/storage"
+	"bytes"
 	"context"
 	"fmt"
-	"bytes"
-	"github.com/labstack/echo"
-	"google.golang.org/api/option"
 	"hash/fnv"
 	"image"
 	_ "image/gif"
@@ -15,9 +12,13 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"time"
 	"strconv"
 	"strings"
+	"time"
+
+	"cloud.google.com/go/storage"
+	"github.com/labstack/echo"
+	"google.golang.org/api/option"
 )
 
 func HashID(imageUrl string) uint32 {
@@ -40,10 +41,10 @@ func ArrangeImageUrl(imageUrl string) string {
 	bktName := "img.gitouhon-juku-k8s2.ga"
 	imageBaseURL := "https://img.gitouhon-juku-k8s2.ga/"
 	credentialFilePath := "config/config_gcp.json"
-	if imageUrl == 	"" || !strings.HasPrefix(imageUrl, "http") {
+	if imageUrl == "" || !strings.HasPrefix(imageUrl, "http") {
 		return getRandomImage()
 	}
-	// fmt.Println(imageUrl) // for imageUrl debug 
+	// fmt.Println(imageUrl) // for imageUrl debug
 	response, err := http.Get(imageUrl)
 	defer response.Body.Close()
 	checkError(err)

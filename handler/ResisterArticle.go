@@ -3,13 +3,13 @@ package handler
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"sync/atomic"
-	"encoding/json"
 
-	"./elastic"
-	"./mongo"
-	"github.com/elastic/go-elasticsearch/esutil"
+	"github.com/elastic/go-elasticsearch/v7/esutil"
+	"github.com/ponyo877/news-app-backend/handler/elastic"
+	"github.com/ponyo877/news-app-backend/handler/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -42,7 +42,7 @@ func RegisterToSearchEngine() {
 		var feed bson.M
 		err = cur.Decode(&feed)
 		checkError(err)
-		
+
 		feed["id"] = feed["_id"]
 		delete(feed, "_id")
 		b, err := json.Marshal(feed)

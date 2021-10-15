@@ -2,17 +2,18 @@ package handler
 
 import (
 	"context"
+	_ "crypto/sha1"
 	"fmt"
-	"time"
 	"net/http"
-	_"crypto/sha1"
-	_"strings"
-	"./mongo"
-	_"./imagectl"
+	_ "strings"
+	"time"
+
 	"github.com/labstack/echo"
+	_ "github.com/ponyo877/news-app-backend/handler/imagectl"
+	"github.com/ponyo877/news-app-backend/handler/mongo"
 	"go.mongodb.org/mongo-driver/bson"
-	orgmongo "go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	orgmongo "go.mongodb.org/mongo-driver/mongo"
 )
 
 // func deviceID2sha1(imageUrl string) uint32 {
@@ -35,7 +36,7 @@ func PutComments() echo.HandlerFunc {
 		// fmt.Println(qdeviceID)
 		qarticleID, err := primitive.ObjectIDFromHex(qarticleIDTmp)
 		checkError(err)
-		
+
 		olayput := "2006-01-02 15:04:05.000"
 		t := time.Now()
 		qpostDate := t.Format(olayput)
@@ -48,7 +49,7 @@ func PutComments() echo.HandlerFunc {
 
 		var usr_info map[string]interface{}
 		usr_col := client.Database("newsdb").Collection("user_col")
-		usr_filter := bson.M {
+		usr_filter := bson.M{
 			"deviceHash": bson.M{"$eq": qdeviceHash},
 		}
 		err = usr_col.FindOne(ctx, usr_filter).Decode(&usr_info)
@@ -58,17 +59,17 @@ func PutComments() echo.HandlerFunc {
 		checkError(err)
 
 		art_col := client.Database("newsdb").Collection("article_col")
-		newComment := map[string]interface{} {
-			"username": usr_info["name"],
-			"avatar": usr_info["avatar"],
+		newComment := map[string]interface{}{
+			"username":   usr_info["name"],
+			"avatar":     usr_info["avatar"],
 			"deviceHash": usr_info["deviceHash"],
-			"massage": qmassage,
-			"postDate": qpostDate,
+			"massage":    qmassage,
+			"postDate":   qpostDate,
 		}
-		art_filter := bson.M {
+		art_filter := bson.M{
 			"_id": bson.M{"$eq": qarticleID},
 		}
-		art_change := bson.M {
+		art_change := bson.M{
 			"$push": bson.M{
 				"comments": newComment,
 			},
@@ -78,4 +79,3 @@ func PutComments() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, map[string]string{"Status": "Ok"})
 	}
 }
-

@@ -1,21 +1,22 @@
 package elastic
 
 import (
-	"strings"
 	"encoding/json"
-	"time"
 	"fmt"
-	_"go.mongodb.org/mongo-driver/bson/primitive"
+	"strings"
+	"time"
+
+	_ "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // for Code Refactoring
 // https://infraya.work/posts/go_json_parse_aws/
 
-func GetSearchResultTmp(searchwords string) []map[string]interface{}{
+func GetSearchResultTmp(searchwords string) []map[string]interface{} {
 	client := OpenES()
 	// query := "{\"query\": { \"match\": { \"titles\": \"" + searchwords + "\"}}}"
 	query := fmt.Sprintf(
-`{"query": {"match": {"titles": "%s"}}}`, // , "fields": ["title", "body"]}}}`,
+		`{"query": {"match": {"titles": "%s"}}}`, // , "fields": ["title", "body"]}}}`,
 		searchwords)
 	res, err := client.Search(
 		client.Search.WithBody(strings.NewReader(query)),
@@ -42,6 +43,6 @@ func GetSearchResultTmp(searchwords string) []map[string]interface{}{
 		feed["_id"] = feed["id"].(string) // (primitive.ObjectID).Hex()
 		searchArray = append(searchArray, feed)
 	}
-	
+
 	return searchArray
 }

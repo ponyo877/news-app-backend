@@ -1,12 +1,19 @@
 package main
 
 import (
-	"./handler"
-	_ "./handler/elastic"
-	"./handler/imagectl"
-	"./handler/mongo"
-	"./handler/redis"
+	// "./handler"
+	// _ "./handler/elastic"
+
+	// "./handler/imagectl"
+	// "./handler/mongo"
+	// "./handler/redis"
+	"github.com/ponyo877/news-app-backend/handler"
+	_ "github.com/ponyo877/news-app-backend/handler/elastic"
+
 	"github.com/labstack/echo"
+	"github.com/ponyo877/news-app-backend/handler/imagectl"
+	"github.com/ponyo877/news-app-backend/handler/mongo"
+	"github.com/ponyo877/news-app-backend/handler/redis"
 )
 
 func main() {

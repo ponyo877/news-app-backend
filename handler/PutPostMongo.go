@@ -8,13 +8,13 @@ import (
 	_ "strconv"
 	"strings"
 
-	_ "./elastic"
-	"./imagectl"
-	"./mongo"
-	"./siever"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/labstack/echo"
 	"github.com/mmcdole/gofeed"
+	_ "github.com/ponyo877/news-app-backend/handler/elastic"
+	"github.com/ponyo877/news-app-backend/handler/imagectl"
+	"github.com/ponyo877/news-app-backend/handler/mongo"
+	"github.com/ponyo877/news-app-backend/handler/siever"
 	"go.mongodb.org/mongo-driver/bson"
 	_ "go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -58,7 +58,7 @@ func PutPostMongoTmp() int {
 			updateLatestDateMongo(siteID, latesteUpdateDate)
 		} else {
 			continue
-		} 
+		}
 		for _, item := range items {
 			if isDuplicate[item.Title] || siever.ContainsNGWord(item.Title) {
 				continue
@@ -79,7 +79,7 @@ func PutPostMongoTmp() int {
 				_, err = col.DeleteMany(ctx, filter)
 				checkError(err)
 
-				feedmap := map[string]interface{} {
+				feedmap := map[string]interface{}{
 					"image":       getImageFromFeedMongo(item.Content),
 					"publishedAt": item.Published,
 					"sitetitle":   siteTitle,

@@ -1,19 +1,20 @@
 package siever
 
 import (
-	_"fmt"
-	"strings"
+	_ "fmt"
 	"regexp"
+	"strings"
+
 	"github.com/tomoemon/text_normalizer"
 )
 
 func normalizeTitle(title string) (normalizedTitle string) {
 	normalizer := text_normalizer.NewTextNormalizer(
-        text_normalizer.AlphabetToHankaku,
-        text_normalizer.KanaToHiragana)
+		text_normalizer.AlphabetToHankaku,
+		text_normalizer.KanaToHiragana)
 	normalizedTitle = normalizer.Replace(title)
 	rep := regexp.MustCompile("[^0-9a-zA-Zぁ-んァ-ヶ一-龠ー]+")
-    normalizedTitle = rep.ReplaceAllString(normalizedTitle, "@")
+	normalizedTitle = rep.ReplaceAllString(normalizedTitle, "@")
 	// fmt.Println(normalizedTitle)
 	return
 }

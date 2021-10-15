@@ -2,11 +2,12 @@ package handler
 
 import (
 	"context"
-	_"fmt"
+	_ "fmt"
 	"net/http"
-	_"strings"
-	"./mongo"
+	_ "strings"
+
 	"github.com/labstack/echo"
+	"github.com/ponyo877/news-app-backend/handler/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -31,9 +32,8 @@ func GetComments() echo.HandlerFunc {
 		var feedmap map[string]interface{}
 		err = col.FindOne(ctx, filter).Decode(&feedmap)
 		checkError(err)
-		
+
 		comments := feedmap["comments"]
 		return c.JSON(http.StatusOK, map[string]interface{}{"data": comments})
 	}
 }
-
